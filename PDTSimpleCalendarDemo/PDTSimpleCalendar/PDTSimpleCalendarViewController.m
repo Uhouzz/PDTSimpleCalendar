@@ -14,6 +14,7 @@
 #import "NSDate+PDTCompare.h"
 
 const CGFloat PDTSimpleCalendarOverlaySize = 14.0f;
+const CGFloat PDTSimpleCalendarTopHeaderViewHeight = 100.0f;
 
 static NSString *const PDTSimpleCalendarViewCellIdentifier = @"com.producteev.collection.cell.identifier";
 static NSString *const PDTSimpleCalendarViewHeaderIdentifier = @"com.producteev.collection.header.identifier";
@@ -22,6 +23,9 @@ static const NSCalendarUnit kCalendarUnitYMD = NSCalendarUnitYear | NSCalendarUn
 @interface PDTSimpleCalendarViewController () <PDTSimpleCalendarViewCellDelegate>
 
 @property (nonatomic, strong) UILabel *overlayView;
+@property (nonatomic, strong) UIView  *topHeaderView;
+@property (nonatomic, strong) UILabel  *beginDateLabel;
+@property (nonatomic, strong) UILabel  *endDateLabel;
 @property (nonatomic, strong) NSDateFormatter *headerDateFormatter; //Will be used to format date in header view and on scroll.
 
 @property (nonatomic, strong) PDTSimpleCalendarViewWeekdayHeader *weekdayHeader;
@@ -85,6 +89,9 @@ static const NSCalendarUnit kCalendarUnitYMD = NSCalendarUnitYear | NSCalendarUn
 - (void)simpleCalendarCommonInit
 {
     self.overlayView = [[UILabel alloc] init];
+    self.topHeaderView = [[UIView alloc] init];
+    self.beginDateLabel = [[UILabel alloc] init];
+    self.endDateLabel = [[UILabel alloc] init];
     self.backgroundColor = [UIColor whiteColor];
     self.overlayTextColor = [UIColor blackColor];
     self.daysPerWeek = 7;
@@ -206,6 +213,14 @@ static const NSCalendarUnit kCalendarUnitYMD = NSCalendarUnitYear | NSCalendarUn
     }
 }
 
+- (NSString *)stringWithDate:(NSDate *)date{
+    NSDateFormatter *format = [[NSDateFormatter alloc] init];
+    format.dateFormat = @"MM月d";
+    NSString *string = [format stringFromDate:date];
+    
+    return string;
+}
+
 - (void)setSelectedDate:(NSDate *)newSelectedDate
 {
     //if newSelectedDate is nil, unselect the current selected cell
@@ -227,6 +242,7 @@ static const NSCalendarUnit kCalendarUnitYMD = NSCalendarUnitYear | NSCalendarUn
     if (_selectedDate && [_selectedDate isLaterThan:newSelectedDate]) {
         [self.bengEndDateArray removeAllObjects];
         [cell setSelected:NO];
+        [self.endDateLabel setText:@"退房"];
     }
 
     [self removeSelectedDate];
@@ -251,6 +267,14 @@ static const NSCalendarUnit kCalendarUnitYMD = NSCalendarUnitYear | NSCalendarUn
         cell.isSameday = [endDate isEqualToDate:startDate];
         cell.isStarday = [date isEqualToDate:startDate];
         [cell setSelected:YES];
+    }
+    
+    
+    
+    [self.beginDateLabel setText:[self stringWithDate:startDate]];
+    
+    if (![endDate isEqualToDate:startDate]) {
+        [self.endDateLabel setText:[self stringWithDate:endDate]];
     }
     
     NSIndexPath *indexPath = [self indexPathForCellAtDate:_selectedDate];
@@ -318,7 +342,33 @@ static const NSCalendarUnit kCalendarUnitYMD = NSCalendarUnitYear | NSCalendarUn
     self.collectionView.delegate = self;
     self.collectionView.dataSource = self;
     [self.collectionView setBackgroundColor:self.backgroundColor];
+    
+    [self.view addSubview:self.topHeaderView];
+    
+    [self.topHeaderView setBackgroundColor:[UIColor whiteColor]];
+    [self.topHeaderView setTranslatesAutoresizingMaskIntoConstraints:NO];
+    
+    [self.beginDateLabel setFont:[UIFont systemFontOfSize:22]];
+    [self.endDateLabel setFont:[UIFont systemFontOfSize:22]];
+    
+    
+    [self.beginDateLabel setBackgroundColor:[UIColor yellowColor]];
+    [self.endDateLabel setBackgroundColor:[UIColor blueColor]];
+    
+    
+    [self.beginDateLabel setText:@"入住"];
+    [self.endDateLabel setText:@"退房"];
+    
+    [self.beginDateLabel setTextAlignment:NSTextAlignmentCenter];
+    [self.endDateLabel setTextAlignment:NSTextAlignmentCenter];
 
+    
+    [self.topHeaderView addSubview:self.beginDateLabel];
+    [self.topHeaderView addSubview:self.endDateLabel];
+
+    [self.beginDateLabel setFrame:CGRectMake(10, 10, 100, 80)];
+    [self.endDateLabel setFrame:CGRectMake(CGRectGetWidth([UIScreen mainScreen].bounds) - 110, 10, 100, 80)];
+    
     //Configure the Overlay View
     [self.overlayView setBackgroundColor:[self.backgroundColor colorWithAlphaComponent:0.90]];
     [self.overlayView setFont:[UIFont boldSystemFontOfSize:PDTSimpleCalendarOverlaySize]];
@@ -334,17 +384,20 @@ static const NSCalendarUnit kCalendarUnitYMD = NSCalendarUnitYear | NSCalendarUn
     
     [self.view addSubview:self.weekdayHeader];
     [self.weekdayHeader setTranslatesAutoresizingMaskIntoConstraints:NO];
+
     
     NSInteger weekdayHeaderHeight = self.weekdayHeaderEnabled ? PDTSimpleCalendarWeekdayHeaderHeight : 0;
+    
+    NSDictionary *viewsDictionary = @{@"topHeaderView":self.topHeaderView,@"overlayView": self.overlayView, @"weekdayHeader": self.weekdayHeader};
+    NSDictionary *metricsDictionary = @{@"topHeaderViewHeight":@(PDTSimpleCalendarTopHeaderViewHeight),@"overlayViewHeight": @(PDTSimpleCalendarFlowLayoutHeaderHeight), @"weekdayHeaderHeight": @(weekdayHeaderHeight)};
 
-    NSDictionary *viewsDictionary = @{@"overlayView": self.overlayView, @"weekdayHeader": self.weekdayHeader};
-    NSDictionary *metricsDictionary = @{@"overlayViewHeight": @(PDTSimpleCalendarFlowLayoutHeaderHeight), @"weekdayHeaderHeight": @(weekdayHeaderHeight)};
-
+    [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"|[topHeaderView]|" options:NSLayoutFormatAlignAllTop metrics:nil views:viewsDictionary]];
+    
     [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"|[overlayView]|" options:NSLayoutFormatAlignAllTop metrics:nil views:viewsDictionary]];
     [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"|[weekdayHeader]|" options:NSLayoutFormatAlignAllTop metrics:nil views:viewsDictionary]];
-    [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[weekdayHeader(weekdayHeaderHeight)][overlayView(overlayViewHeight)]" options:0 metrics:metricsDictionary views:viewsDictionary]];
+    [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[topHeaderView(topHeaderViewHeight)][weekdayHeader(weekdayHeaderHeight)][overlayView(overlayViewHeight)]" options:0 metrics:metricsDictionary views:viewsDictionary]];
     
-    [self.collectionView setContentInset:UIEdgeInsetsMake(weekdayHeaderHeight, 0, 0, 0)];
+    [self.collectionView setContentInset:UIEdgeInsetsMake(weekdayHeaderHeight + PDTSimpleCalendarTopHeaderViewHeight, 0, 0, 0)];
 }
 
 #pragma mark - Rotation Handling
@@ -529,7 +582,7 @@ static const NSCalendarUnit kCalendarUnitYMD = NSCalendarUnitYear | NSCalendarUn
     if (fabs(velocity.y) > 0.0f) {
         if (self.overlayView.alpha < 1.0) {
             [UIView animateWithDuration:0.25 animations:^{
-                [self.overlayView setAlpha:1.0];
+//                [self.overlayView setAlpha:1.0];
             }];
         }
     }

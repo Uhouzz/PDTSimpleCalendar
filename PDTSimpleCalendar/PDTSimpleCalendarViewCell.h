@@ -47,6 +47,9 @@
  */
 - (UIColor *)simpleCalendarViewCell:(PDTSimpleCalendarViewCell *)cell circleColorForDate:(NSDate *)date;
 
+- (UIColor *)simpleCalendarViewCell:(PDTSimpleCalendarViewCell *)cell circleSelectedForDate:(NSDate *)date;
+
+
 @end
 
 /**

@@ -18,11 +18,23 @@
  */
 - (void)addRoundedCorners:(UIRectCorner)corners
                 withRadii:(CGSize)radii {
+    
+    [self addRoundedCorners:corners withRadii:radii stroke:NO];
+}
+
+
+- (void)addRoundedCorners:(UIRectCorner)corners
+                withRadii:(CGSize)radii
+                   stroke:(BOOL)isStroke {
     [self layoutIfNeeded];
     UIBezierPath* rounded = [UIBezierPath bezierPathWithRoundedRect:self.bounds byRoundingCorners:corners cornerRadii:radii];
     CAShapeLayer* maskLayer = [[CAShapeLayer alloc] init];
     maskLayer.frame = self.bounds;
-    maskLayer.fillColor  = self.backgroundColor.CGColor;
+    if (isStroke) {
+        maskLayer.strokeColor = self.backgroundColor.CGColor;
+    } else {
+        maskLayer.fillColor = self.backgroundColor.CGColor;
+    }
     [maskLayer setPath:rounded.CGPath];
     self.layer.mask = maskLayer;
 }

@@ -145,6 +145,7 @@ const CGFloat PDTSimpleCalendarCircleSize = 32.0f;
 {
     UIColor *circleColor = (today) ? [self circleTodayColor] : [self circleDefaultColor];
     UIColor *labelColor = (today) ? [self textTodayColor] : [self textDefaultColor];
+    UIColor *circleSelectedColor = [self circleSelectedColor];
 
     if (self.date && self.delegate) {
         if ([self.delegate respondsToSelector:@selector(simpleCalendarViewCell:shouldUseCustomColorsForDate:)] && [self.delegate simpleCalendarViewCell:self shouldUseCustomColorsForDate:self.date]) {
@@ -156,11 +157,15 @@ const CGFloat PDTSimpleCalendarCircleSize = 32.0f;
             if ([self.delegate respondsToSelector:@selector(simpleCalendarViewCell:circleColorForDate:)] && [self.delegate simpleCalendarViewCell:self circleColorForDate:self.date]) {
                 circleColor = [self.delegate simpleCalendarViewCell:self circleColorForDate:self.date];
             }
+            
+            if ([self.delegate respondsToSelector:@selector(simpleCalendarViewCell:circleSelectedForDate:)] && [self.delegate simpleCalendarViewCell:self circleSelectedForDate:self.date]) {
+                circleSelectedColor = [self.delegate simpleCalendarViewCell:self circleSelectedForDate:self.date];
+            }
         }
     }
     
     if (selected) {
-        circleColor = [self circleSelectedColor];
+        circleColor = circleSelectedColor;
         labelColor = [self textSelectedColor];
     }
 
@@ -221,7 +226,7 @@ const CGFloat PDTSimpleCalendarCircleSize = 32.0f;
         return _circleDefaultColor;
     }
 
-    return [UIColor whiteColor];
+    return [UIColor clearColor];
 }
 
 - (UIColor *)circleTodayColor

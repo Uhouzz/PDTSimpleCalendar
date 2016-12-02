@@ -52,10 +52,6 @@
  */
 @property (nonatomic, strong) UIColor *backgroundColor;
 
-/**
- *  Text color for the overlay view (Month and Year when the user scrolls the calendar)
- */
-@property (nonatomic, strong) UIColor *overlayTextColor;
 
 /**
  *  Setting this to YES shows an extra row in the header with acronymns for the the weekdays
@@ -98,6 +94,11 @@
  */
 - (void)scrollToDate:(NSDate *)date animated:(BOOL)animated;
 
+@property (nonatomic, strong) NSDate *selectedBeginDate;
+@property (nonatomic, strong) NSDate *selectedEndDate;
+
+- (void) resetSelectedDate;
+
 @end
 
 
@@ -124,7 +125,7 @@
  *  @param controller the calendarView Controller
  *  @param date       the date being selected (Midnight GMT).
  */
-- (void)simpleCalendarViewController:(PDTSimpleCalendarViewController *)controller didSelectDate:(NSDate *)date;
+- (void)simpleCalendarViewController:(PDTSimpleCalendarViewController *)controller didSelectDate:(NSDate *)date beginDate:(BOOL)isBegin;
 
 /** @name Color Customization */
 
@@ -146,6 +147,7 @@
  */
 - (UIColor *)simpleCalendarViewController:(PDTSimpleCalendarViewController *)controller circleColorForDate:(NSDate *)date;
 
+
 /**
  *  Asks the delegate for the text color for a custom added date
  *
@@ -153,5 +155,11 @@
  *  @param date       the date (Midnight GMT)
  */
 - (UIColor *)simpleCalendarViewController:(PDTSimpleCalendarViewController *)controller textColorForDate:(NSDate *)date;
+
+- (UIColor *)simpleCalendarViewController:(PDTSimpleCalendarViewController *)controller circleSelectedColorForDate:(NSDate *)date;
+
+- (UIView *)headerViewWithSimpleCalendarViewController:(PDTSimpleCalendarViewController *)controller;
+
+- (UIView *)bottomViewWithSimpleCalendarViewController:(PDTSimpleCalendarViewController *)controller;
 
 @end;

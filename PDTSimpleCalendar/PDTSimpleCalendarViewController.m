@@ -299,6 +299,8 @@ static const NSCalendarUnit kCalendarUnitYMD = NSCalendarUnitYear | NSCalendarUn
 
 - (void)viewDidLoad
 {
+    self.edgesForExtendedLayout = UIRectEdgeNone;
+    
     [super viewDidLoad];
     // Do any additional setup after loading the view.
 
@@ -327,15 +329,15 @@ static const NSCalendarUnit kCalendarUnitYMD = NSCalendarUnitYear | NSCalendarUn
             [self.view addSubview:headerView];
             headerView.frame = CGRectMake(0, 0, CGRectGetWidth(headerView.frame), CGRectGetHeight(headerView.frame));
             [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"|[weekdayHeader]|" options:NSLayoutFormatAlignAllTop metrics:nil views:viewsDic]];
-            [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-topHeight-[weekdayHeader(weekdayHeaderHeight)]|"
-                                                                              options:NSLayoutFormatAlignAllTop metrics:@{@"topHeight":@(CGRectGetHeight(headerView.frame)),@"weekdayHeaderHeight": @(weekdayHeaderHeight)}
+            [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-topHeight-[weekdayHeader(weekdayHeaderHeight)]"
+                                                                              options:NSLayoutFormatAlignAllTop metrics:@{@"topHeight":@(CGRectGetMaxY(headerView.frame)),@"weekdayHeaderHeight": @(weekdayHeaderHeight)}
                                                                                 views:viewsDic]];
             
             [self.collectionView setContentInset:UIEdgeInsetsMake(CGRectGetHeight(headerView.frame) + weekdayHeaderHeight, 0, 0, 0)];
         }
     } else {
         [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"|[weekdayHeader]|" options:NSLayoutFormatAlignAllTop metrics:nil views:viewsDic]];
-        [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[weekdayHeader(weekdayHeaderHeight)]|"
+        [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[weekdayHeader(weekdayHeaderHeight)]"
                                                                           options:NSLayoutFormatAlignAllTop metrics:@{@"weekdayHeaderHeight": @(weekdayHeaderHeight)}
                                                                             views:viewsDic]];
         [self.collectionView setContentInset:UIEdgeInsetsMake(weekdayHeaderHeight, 0, 0, 0)];
@@ -346,7 +348,7 @@ static const NSCalendarUnit kCalendarUnitYMD = NSCalendarUnitYear | NSCalendarUn
         
         if (bottomView) {
             [self.view addSubview:bottomView];
-            bottomView.frame = CGRectMake(0, CGRectGetHeight(self.view.frame) - CGRectGetHeight(bottomView.frame), CGRectGetWidth(bottomView.frame), CGRectGetHeight(bottomView.frame));
+            bottomView.frame = CGRectMake(0, CGRectGetMaxY(self.view.frame) - CGRectGetHeight(bottomView.frame), CGRectGetWidth(bottomView.frame), CGRectGetHeight(bottomView.frame));
             [self.collectionView setContentInset:UIEdgeInsetsMake(self.collectionView.contentInset.top, 0, CGRectGetHeight(bottomView.frame) + 30, 0)];
         }
     }
@@ -365,6 +367,9 @@ static const NSCalendarUnit kCalendarUnitYMD = NSCalendarUnitYear | NSCalendarUn
 
 - (void)resetSelectedDate {
     [self removeSelectedDate];
+    self.selectedDate = nil;
+    [self.selectedDateArray removeAllObjects];
+    [self.bengEndDateArray removeAllObjects];
 }
 
 #pragma mark - Rotation Handling

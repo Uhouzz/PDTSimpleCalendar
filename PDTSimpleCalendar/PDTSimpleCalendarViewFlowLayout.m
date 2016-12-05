@@ -11,9 +11,9 @@
 const CGFloat PDTSimpleCalendarFlowLayoutMinInterItemSpacing = 0.0f;
 const CGFloat PDTSimpleCalendarFlowLayoutMinLineSpacing = 0.0f;
 const CGFloat PDTSimpleCalendarFlowLayoutInsetTop = 5.0f;
-const CGFloat PDTSimpleCalendarFlowLayoutInsetLeft = 2.0f;
+const CGFloat PDTSimpleCalendarFlowLayoutInsetLeft = 0.5f;
 const CGFloat PDTSimpleCalendarFlowLayoutInsetBottom = 5.0f;
-const CGFloat PDTSimpleCalendarFlowLayoutInsetRight = 2.0f;
+const CGFloat PDTSimpleCalendarFlowLayoutInsetRight = 0.5f;
 const CGFloat PDTSimpleCalendarFlowLayoutHeaderHeight = 50.0f;
 
 @implementation PDTSimpleCalendarViewFlowLayout

@@ -261,6 +261,39 @@ static const NSCalendarUnit kCalendarUnitYMD = NSCalendarUnitYear | NSCalendarUn
     }
 }
 
+- (void) setupDefaultSelectedData {
+    
+    if (!self.selectedBeginDate || !self.selectedEndDate) {
+        return;
+    }
+    
+    _selectedDate = self.selectedEndDate;
+    
+    [self.bengEndDateArray removeAllObjects];
+    [self.bengEndDateArray addObject:self.selectedBeginDate];
+    [self.bengEndDateArray addObject:self.selectedEndDate];
+    
+    self.selectedDateArray = [NSMutableArray arrayWithArray:[self.selectedBeginDate dateArrayBeetwenEndDate:self.selectedEndDate]];
+    
+    for (NSDate *date in self.selectedDateArray ) {
+        PDTSimpleCalendarViewCell * cell = [self cellForItemAtDate:date];
+        cell.isEndday = [date isEqualToDate:self.selectedEndDate];
+        cell.isSameday = [self.selectedEndDate isEqualToDate:self.selectedBeginDate];
+        cell.isStarday = [date isEqualToDate:self.selectedBeginDate];
+        [cell setSelected:YES];
+    }
+
+    NSIndexPath *indexPath = [self indexPathForCellAtDate:_selectedDate];
+    [self.collectionView reloadItemsAtIndexPaths:@[ indexPath ]];
+    
+    if ([self.delegate respondsToSelector:@selector(simpleCalendarViewController:didSelectDate:beginDate:)]) {
+        [self.delegate simpleCalendarViewController:self didSelectDate:self.selectedBeginDate beginDate:YES];
+        [self.delegate simpleCalendarViewController:self didSelectDate:self.selectedEndDate beginDate:NO];
+    }
+    
+    [self scrollToDate:self.selectedBeginDate animated:NO];
+}
+
 #pragma mark - Scroll to a specific date
 
 - (void)scrollToSelectedDate:(BOOL)animated
@@ -353,16 +386,7 @@ static const NSCalendarUnit kCalendarUnitYMD = NSCalendarUnitYear | NSCalendarUn
         }
     }
     
-    if (self.selectedBeginDate) {
-        self.selectedDate = self.selectedBeginDate;
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [self scrollToDate:self.selectedBeginDate animated:YES];
-        });
-    }
-    
-    if (self.selectedEndDate) {
-        self.selectedDate = self.selectedEndDate;
-    }
+    [self setupDefaultSelectedData];
 }
 
 - (void)resetSelectedDate {
@@ -431,8 +455,6 @@ static const NSCalendarUnit kCalendarUnitYMD = NSCalendarUnitYear | NSCalendarUn
     NSDate *cellDate = [self dateForCellAtIndexPath:indexPath];
     NSDate *startDate = [self.bengEndDateArray firstObject];
     NSDate *endDate = [self.bengEndDateArray lastObject];
-    
-    
 
     NSDateComponents *cellDateComponents = [self.calendar components:kCalendarUnitYMD fromDate:cellDate];
     NSDateComponents *firstOfMonthsComponents = [self.calendar components:kCalendarUnitYMD fromDate:firstOfMonth];
@@ -537,10 +559,11 @@ static const NSCalendarUnit kCalendarUnitYMD = NSCalendarUnitYear | NSCalendarUn
 }
 
 #pragma mark - UICollectionViewFlowLayoutDelegate
+
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath
 {
     CGFloat itemWidth = floorf(CGRectGetWidth(self.collectionView.bounds) / self.daysPerWeek);
-    
+
     return CGSizeMake(itemWidth, itemWidth);
 }
 

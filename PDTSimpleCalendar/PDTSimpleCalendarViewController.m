@@ -381,7 +381,8 @@ static const NSCalendarUnit kCalendarUnitYMD = NSCalendarUnitYear | NSCalendarUn
         
         if (bottomView) {
             [self.view addSubview:bottomView];
-            CGFloat safeAreaInsetsBottom = [UIScreen mainScreen].bounds.size.height == 812 ? 34 : 0;
+            BOOL needHair = ([UIScreen mainScreen].bounds.size.height == 812) || ([UIScreen mainScreen].bounds.size.height == 896);
+            CGFloat safeAreaInsetsBottom = needHair ? 34 : 0;
             bottomView.frame = CGRectMake(0, CGRectGetMaxY(self.view.frame) - CGRectGetHeight(bottomView.frame) - safeAreaInsetsBottom, CGRectGetWidth(bottomView.frame), CGRectGetHeight(bottomView.frame));
             [self.collectionView setContentInset:UIEdgeInsetsMake(self.collectionView.contentInset.top, 0, 30, 0)];
 
